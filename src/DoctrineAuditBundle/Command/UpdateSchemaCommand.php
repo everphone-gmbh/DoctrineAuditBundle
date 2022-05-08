@@ -6,7 +6,6 @@ use DH\DoctrineAuditBundle\Helper\UpdateHelper;
 use DH\DoctrineAuditBundle\Manager\AuditManager;
 use DH\DoctrineAuditBundle\Reader\AuditReader;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class UpdateSchemaCommand extends Command implements ContainerAwareInterface
 {
-    use LockableTrait;
 
     protected static $defaultName = 'audit:schema:update';
 
@@ -32,10 +30,6 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
         $this->container = $container;
     }
 
-    public function unlock(): void
-    {
-        $this->release();
-    }
 
     protected function configure(): void
     {
@@ -51,12 +45,6 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
     {
         if (null === $this->container) {
             throw new RuntimeException('No container.');
-        }
-
-        if (!$this->lock()) {
-            $output->writeln('The command is already running in another process.');
-
-            return 0;
         }
 
         $io = new SymfonyStyle($input, $output);
@@ -82,10 +70,6 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
         $sqls = $updater->getUpdateAuditSchemaSql();
 
         if (empty($sqls)) {
-            $io->success('Nothing to update.');
-
-            $this->release();
-
             return 0;
         }
 
@@ -123,8 +107,6 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
         }
 
         if ($dumpSql || $force) {
-            $this->release();
-
             return 0;
         }
 
@@ -140,9 +122,6 @@ class UpdateSchemaCommand extends Command implements ContainerAwareInterface
                 sprintf('    <info>%s --dump-sql</info> to dump the SQL statements to the screen', $this->getName()),
             ]
         );
-
-        $this->release();
-
         return 1;
     }
 }
