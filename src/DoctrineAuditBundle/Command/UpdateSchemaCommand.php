@@ -6,7 +6,6 @@ use DH\DoctrineAuditBundle\Helper\UpdateHelper;
 use DH\DoctrineAuditBundle\Manager\AuditManager;
 use DH\DoctrineAuditBundle\Reader\AuditReader;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Command\LockableTrait;
 use Symfony\Component\Console\Exception\RuntimeException;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputInterface;
@@ -18,7 +17,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class UpdateSchemaCommand extends Command implements ContainerAwareInterface
 {
-    use LockableTrait;
 
     protected static $defaultName = 'audit:schema:update';
 
